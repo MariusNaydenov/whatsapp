@@ -11,11 +11,18 @@ const SignUp = () => {
 
   const register = async (e) => {
     e.preventDefault();
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: emailValue, password, username }),
-    });
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailValue, password, username }),
+      });
+      setEmailValue("");
+      setPasswordValue("");
+      setUsernameValue("");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (

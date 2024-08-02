@@ -28,6 +28,7 @@ const Login = () => {
         const token = localStorage.getItem("token");
         const decoded = jwtDecode(token);
         setUser(decoded);
+        navigate("/home");
       }
     } catch (err) {
       console.log(err);

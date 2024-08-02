@@ -3,9 +3,11 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import User from "../dbModels/userModel.js";
-import genSalt from "bcryptjs";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import chatModel from "../dbModels/chatModel.js";
+import messageModel from "../dbModels/messageModel.js";
+
 dotenv.config();
 const MY_URI = process.env.MY_URI;
 const PORT = process.env.PORT;
@@ -95,5 +97,96 @@ app.post("/api/login", async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json("Error");
+  }
+});
+
+app.get("/api/users", async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(201).json(users);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json("Error");
+  }
+});
+
+app.post("/api/user", async (req, res) => {
+  const { id } = req.body;
+
+  try {
+    const user = await User.findById(id);
+    res.status(201).json(user);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json("Error");
+  }
+});
+
+app.post("/api/create-chat", async (req, res) => {
+  const { firstId, secondId, content } = req.body;
+
+  try {
+    const sender = await User.findById(firstId);
+    const receiver = await User.findById(secondId);
+    const createdMessage = new messageModel({
+      sender: sender,
+      content: content,
+    });
+    await createdMessage.save();
+    let chat = await chatModel.findOne({
+      members: { $all: [firstId, secondId] },
+    });
+
+    if (chat) {
+      await chat.updateOne({ $push: { messages: createdMessage } });
+    } else {
+      chat = await chatModel.create({
+        members: [firstId, secondId],
+        participantOne: sender,
+        participantTwo: receiver,
+        messages: [createdMessage],
+      });
+    }
+    res.status(201).json(chat);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json("server error");
+  }
+});
+
+app.get("/api/get-chats/:userId", async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const chats = await chatModel.find({
+      members: { $in: [userId] },
+    });
+    if (chats) {
+      res.status(201).json(chats);
+    } else {
+      res.status(201).json([]);
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json("server error");
+  }
+});
+
+app.get("/api/chat/:firstUserId/:secondUserId", async (req, res) => {
+  const { firstUserId, secondUserId } = req.params;
+
+  try {
+    const chat = await chatModel.find({
+      members: { $all: [firstUserId, secondUserId] },
+    });
+
+    if (chat) {
+      res.status(200).json(chat);
+    } else {
+      res.status(200).json([]);
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json("Server error");
   }
 });

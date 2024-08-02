@@ -8,6 +8,9 @@ import { jwtDecode } from "jwt-decode";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [selectedPerson, setSelectedPerson] = useState(null);
+  const [message, setMessage] = useState("");
+  const [chat, setChat] = useState([]);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -21,6 +24,12 @@ function App() {
       value={{
         user,
         setUser,
+        selectedPerson,
+        setSelectedPerson,
+        message,
+        setMessage,
+        chat,
+        setChat,
       }}
     >
       <BrowserRouter>
