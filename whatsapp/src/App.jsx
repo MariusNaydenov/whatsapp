@@ -11,6 +11,8 @@ function App() {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
+  const [peopleChattedWith, setPeopleChattedWith] = useState([]);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -30,6 +32,8 @@ function App() {
         setMessage,
         chat,
         setChat,
+        peopleChattedWith,
+        setPeopleChattedWith,
       }}
     >
       <BrowserRouter>

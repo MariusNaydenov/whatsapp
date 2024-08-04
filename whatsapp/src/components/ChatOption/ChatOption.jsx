@@ -1,15 +1,33 @@
 import React, { useContext, useEffect, useState } from "react";
 import { HiOutlinePencilSquare } from "react-icons/hi2";
 import { MdOutlineSubject } from "react-icons/md";
-import { CgProfile } from "react-icons/cg";
 import AppContext from "../../Context/AppContext";
+import io from "socket.io-client";
+const socket = io("http://localhost:3000");
 
 function ChatOption() {
-  const { selectedPerson, setSelectedPerson, user, setChat } =
-    useContext(AppContext);
+  const {
+    selectedPerson,
+    setSelectedPerson,
+    user,
+    setChat,
+    chat,
+    peopleChattedWith,
+    setPeopleChattedWith,
+  } = useContext(AppContext);
   const [newChat, setNewChat] = useState(false);
   const [users, setUsers] = useState([]);
-  const [peopleChattedWith, setPeopleChattedWith] = useState([]);
+
+  // const [peopleChattedWith, setPeopleChattedWith] = useState([]);
+
+  useEffect(() => {
+    socket.on("message", (msg) => {
+      setChat([...msg]);
+    });
+    socket.on("someData", (data) => {
+      // getChats with id to search
+    });
+  }, []);
 
   const handleSelectedPerson = async (id, firstUserId, secondUserId) => {
     try {
@@ -29,15 +47,15 @@ function ChatOption() {
       const chatData = await chatResponse.json();
       if (chatData.length > 0) {
         setChat(chatData[0].messages);
+        user.messages = chat;
       } else {
         setChat([]);
+        user.messages = chat;
       }
     } catch (err) {
       console.log(err);
     }
   };
-
-  // const date = `${new Date().getHours()}:${new Date().getMinutes()}`;
 
   const getChats = async () => {
     try {
@@ -46,6 +64,11 @@ function ChatOption() {
       );
       const data = await response.json();
       user.people = data;
+      data.sort(
+        (a, b) =>
+          new Date(b.messages[b.messages.length - 1].createdAt) -
+          new Date(a.messages[a.messages.length - 1].createdAt)
+      );
 
       setPeopleChattedWith(data);
     } catch (err) {
@@ -55,7 +78,7 @@ function ChatOption() {
 
   useEffect(() => {
     getChats();
-  }, [user]);
+  }, [user, chat]);
 
   const getUsers = async () => {
     try {
@@ -72,7 +95,7 @@ function ChatOption() {
   const handleNewChatModal = async () => {
     setNewChat(!newChat);
     const allUsers = await getUsers();
-    setUsers(allUsers);
+    setUsers(allUsers.sort((a, b) => a.username.localeCompare(b.username)));
   };
 
   return (
@@ -155,10 +178,20 @@ function ChatOption() {
         className="w-full border-[1px] mt-5 rounded pl-3 text-sm py-1 outline-0"
         placeholder="Search or start a new chat"
       />
-      <div className="flex flex-col">
+      <div
+        className="flex flex-col grow overflow-y-auto "
+        style={{ maxHeight: "565px" }}
+      >
         {peopleChattedWith.map((person) => {
+          const lastMsg = person.messages[person.messages.length - 1].content;
+          const timestamp =
+            person.messages[person.messages.length - 1].createdAt;
           const lastMessage =
-            person.messages[person.messages.length - 1].content;
+            lastMsg.length > 15 ? lastMsg.slice(0, 28) + "..." : lastMsg;
+          const date = new Date(timestamp);
+          const day = date.getDay();
+          const month = date.getMonth();
+          const year = date.getFullYear();
           if (user.username === person.participantOne.username) {
             return (
               <div
@@ -169,7 +202,16 @@ function ChatOption() {
                     person.participantTwo._id
                   )
                 }
-                className="flex flex-row mt-5 gap-3 cursor-pointer hover:bg-neutral-300 py-2 rounded px-2"
+                className={`flex flex-row mt-5 gap-3 cursor-pointer hover:bg-neutral-100 py-2 rounded px-2
+                  ${
+                    selectedPerson
+                      ? selectedPerson.username ===
+                        person.participantTwo.username
+                        ? "bg-neutral-300"
+                        : ""
+                      : ""
+                  }
+                  `}
                 key={person.participantTwo._id}
               >
                 {!person.image ? (
@@ -177,11 +219,16 @@ function ChatOption() {
                 ) : (
                   <img src={person.image} />
                 )}
-                <div className="flex flex-col">
+                <div className="flex flex-col flex-grow">
                   <span className="text-sm font-bold">
                     {person.participantTwo.username}
                   </span>
-                  <span className="text-sm text-gray-400"> {lastMessage}</span>
+                  <span className="text-sm text-slate-600"> {lastMessage}</span>
+                </div>
+                <div className="flex justify-end items-center mb-4">
+                  <span className="text-xs text-slate-600 ">
+                    {day}/{month}/{year}
+                  </span>
                 </div>
               </div>
             );
@@ -195,7 +242,7 @@ function ChatOption() {
                     person.participantOne._id
                   )
                 }
-                className="flex flex-row mt-5 gap-3 cursor-pointer hover:bg-neutral-300 py-2 rounded px-2"
+                className="flex flex-row mt-5 gap-3 cursor-pointer hover:bg-neutral-100 py-2 rounded px-2"
                 key={person.participantOne._id}
               >
                 {!person.image ? (
@@ -203,11 +250,16 @@ function ChatOption() {
                 ) : (
                   <img src={person.image} />
                 )}
-                <div className="flex flex-col">
+                <div className="flex flex-col flex-grow">
                   <span className="text-sm font-bold">
                     {person.participantOne.username}
                   </span>
-                  <span className="text-sm text-gray-400"> {lastMessage}</span>
+                  <span className="text-sm text-slate-600"> {lastMessage}</span>
+                </div>
+                <div className="flex justify-end items-center mb-4">
+                  <span className="text-xs text-slate-600 ">
+                    {day}/{month}/{year}
+                  </span>
                 </div>
               </div>
             );

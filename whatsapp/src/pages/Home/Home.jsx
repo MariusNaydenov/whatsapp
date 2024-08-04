@@ -51,7 +51,7 @@ function Home() {
               }}
               className="py-2 px-2 hover:bg-neutral-200"
             >
-              <MdOutlineStorage size={20} />
+              <MdOutlineStorage size={18} />
             </div>
             <div
               onClick={() => handleOption("chat")}
@@ -67,7 +67,7 @@ function Home() {
               }}
               className="py-2 px-2 hover:bg-neutral-200"
             >
-              <BsChatText size={20} />
+              <BsChatText size={18} />
             </div>
             <div
               onClick={() => handleOption("phone")}
@@ -83,7 +83,7 @@ function Home() {
               }}
               className="py-2 px-2 hover:bg-neutral-200"
             >
-              <FiPhone size={20} />
+              <FiPhone size={18} />
             </div>
             <div
               onClick={() => handleOption("status")}
@@ -99,7 +99,7 @@ function Home() {
               }}
               className="py-2 px-2 hover:bg-neutral-200"
             >
-              <MdOutlineWifiTetheringErrorRounded size={20} />
+              <MdOutlineWifiTetheringErrorRounded size={18} />
             </div>
           </div>
           <div className="flex flex-col py-3 gap-4">
@@ -117,7 +117,7 @@ function Home() {
               }}
               className="py-2 px-2 hover:bg-neutral-200"
             >
-              <FaRegStar size={20} />
+              <FaRegStar size={18} />
             </div>
             <div
               onClick={() => handleOption("archive")}
@@ -133,7 +133,7 @@ function Home() {
               }}
               className="py-2 px-2 hover:bg-neutral-200"
             >
-              <FiArchive size={20} />
+              <FiArchive size={18} />
             </div>
             <hr style={{ width: "100%" }} />
             <div
@@ -150,7 +150,7 @@ function Home() {
               }}
               className="py-2 px-2 hover:bg-neutral-200"
             >
-              <IoSettingsOutline size={20} />
+              <IoSettingsOutline size={18} />
             </div>
             <div
               onClick={() => handleOption("profile")}
@@ -166,7 +166,7 @@ function Home() {
               }}
               className="py-2 px-2 hover:bg-neutral-200"
             >
-              <CgProfile size={20} />
+              <CgProfile size={18} />
             </div>
           </div>
         </div>

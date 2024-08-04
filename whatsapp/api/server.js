@@ -7,6 +7,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import chatModel from "../dbModels/chatModel.js";
 import messageModel from "../dbModels/messageModel.js";
+import http from "http";
+import { Server } from "socket.io";
 
 dotenv.config();
 const MY_URI = process.env.MY_URI;
@@ -30,11 +32,36 @@ app.use(
   })
 );
 
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
+
+io.on("connection", (socket) => {
+  // console.log("A user connected");
+
+  socket.on("message", (msg) => {
+    // console.log("Message received: " + msg);
+    io.emit("message", msg);
+  });
+
+  socket.on("someData", (data) => {
+    io.emit("someData", data);
+  });
+
+  socket.on("disconnect", () => {
+    // console.log("User disconnected");
+  });
+});
+
 mongoose
   .connect(MY_URI)
   .then(() => {
     console.log("connected to MongoDB");
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`app is listen on port http://localhost:${PORT} `);
     });
   })
@@ -139,6 +166,7 @@ app.post("/api/create-chat", async (req, res) => {
 
     if (chat) {
       await chat.updateOne({ $push: { messages: createdMessage } });
+      chat = await chatModel.findById(chat._id).populate("messages");
     } else {
       chat = await chatModel.create({
         members: [firstId, secondId],

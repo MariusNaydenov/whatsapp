@@ -5,7 +5,7 @@ import ChatMessages from "../ChatMessages/ChatMessages";
 import AppContext from "../../Context/AppContext";
 
 function Chat() {
-  const { selectedPerson, user } = useContext(AppContext);
+  const { selectedPerson } = useContext(AppContext);
   const firstLetter = selectedPerson.username.slice(0, 1);
   const restLetters = selectedPerson.username.slice(1);
 

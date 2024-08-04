@@ -9,6 +9,8 @@ const AppContext = createContext({
   setSelectedPerson() {},
   chat: [],
   setChat() {},
+  peopleChattedWith: [],
+  setPeopleChattedWith() {},
 });
 
 export default AppContext;
