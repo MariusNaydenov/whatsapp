@@ -3,13 +3,8 @@ import { HiOutlinePencilSquare } from "react-icons/hi2";
 import { MdOutlineSubject } from "react-icons/md";
 import AppContext from "../../Context/AppContext";
 import io from "socket.io-client";
-const api = import.meta.env.VITE_API_URL;
 
-const socket = io(
-  api === `http://localhost:3000/api`
-    ? "http://localhost:3000"
-    : "https://whatsapp-fawn-omega.vercel.app"
-);
+const socket = io("http://localhost:3000");
 
 function ChatOption() {
   const {
